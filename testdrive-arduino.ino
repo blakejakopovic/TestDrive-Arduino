@@ -11,7 +11,7 @@ void setup() {
 void loop()
 {
   // Read temperature
-  my_temp = 22.5; // celsius
+  my_temp = 23.5; // celsius
 
   // Update sensor reading using TestDrive
   TestDrive.sendTemperature(my_temp);
