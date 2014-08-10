@@ -3,13 +3,18 @@
 
 This library adds Arduino support for the TestDrive dashboard. It provides a simple API, and supports for many common sensor types.
 
-**This library is build to work with [TestDrive Dashboard](#) to provide a real-time dashboard for your Arduino projects.**
+**This library is build to work with [TestDrive Dashboard](https://github.com/blakejakopovic/TestDrive) to provide a real-time dashboard for your Arduino projects.**
+
+## Demo!
+
+To view the demo dashboard, please visit [http://blakejakopovic.github.io/TestDrive/](http://blakejakopovic.github.io/TestDrive/). It uses simulated
+sensor readings, but your dashboard will be automatically customised based on the data you send it.
 
 ## Key Features
 * Simple integration into existing projects
 * Light weight
 * Easy to use
-* Supports many sensor readings, including **Acceleration, Magnetic, Orientation, Gyro, Temperature, Distance, Light, Pressure, Humidity, Current, Voltage, and Color**
+* Supports many sensor readings, including **Temperature, Distance, Light, Pressure, Altitude, Humidity, Current and Voltage** (with Acceleration, Magnetic, Orientation, Gyro, Color and others coming soon)
 * Supports sensor labels (eg. Bedroom, Kitchen, Front Left, Front Right)
 * Ability to control update frequency
 
@@ -28,7 +33,7 @@ void setup() {
 void loop()
 {
   // Read temperature
-  my_temp = 22.5; // celsius
+  my_temp = 23.5; // celsius
 
   // Update sensor reading using TestDrive
   TestDrive.sendTemperature(my_temp);
@@ -40,7 +45,7 @@ void loop()
 
 ## Examples
 * [Getting Started](#)
-* [Weather Station](#)
+* [Weather Station](#) using BMP180 and DHT22 sensors
 
 ## Future
 * Support for more sensor types, with better dashboard visualisations.
@@ -51,6 +56,8 @@ void loop()
 
 ## Contributing
 All contributions welcome.
+
+Developers should take a look at the [DEVELOPER.md](#) document for how to setup their environment.
 
 ## License
 

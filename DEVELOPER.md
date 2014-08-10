@@ -7,7 +7,7 @@
 
 #### OS X
 
-Before starting, please make sure you have those installed:
+Before starting, please make sure you have the following installed:
 
 *	[Arduino IDE](http://arduino.cc/en/main/software) - Download the app from the website
 *	[Homebrew](http://mxcl.github.io/homebrew/) - Follow the instructions on their website
@@ -26,7 +26,7 @@ $ sudo apt-get install git arduino
 
 #### OS X
 
-We've made a [Homebrew](http://brew.sh/) `formula` that you can `tap` like [*dat ass*](https://www.youtube.com/watch?v=18gp_NBg43c):
+We've made a [Homebrew](http://brew.sh/) `formula` that you can `tap`:
 
 ```Bash
 $ brew tap WeAreLeka/avr
@@ -82,7 +82,7 @@ $ pip install pyserial
 
 Let's build 'TestDrive-Arduino':
 
-First `cd` to `testdrive-arduino` folder and copy the `Makefile-<os name>.mk` for your system:
+First `cd` to `TestDrive-Arduino` folder and copy the `Makefile-<os name>.mk` for your system:
 
 ```Bash
 $ cp Makefile-OSX.mk ./Makefile
