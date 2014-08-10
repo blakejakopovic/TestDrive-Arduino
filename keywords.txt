@@ -12,6 +12,7 @@ sendHumidity KEYWORD2
 sendCurrent KEYWORD2
 sendVoltage KEYWORD2
 sendColor KEYWORD2
+sendAltitude KEYWORD2
 
 setLabel KEYWORD2
 sendLog KEYWORD2
