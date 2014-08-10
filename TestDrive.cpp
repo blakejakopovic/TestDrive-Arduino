@@ -131,6 +131,18 @@ void TestDriveClass::sendVoltage(float volts)
   sendVoltage(0, volts);
 }
 
+/**  Altitude */
+
+void TestDriveClass::sendAltitude(byte id, float meters)
+{
+  sendEvent(SENSOR_TYPE_ALTITUDE, id, sizeof(float), floatToBytes(meters));
+}
+
+void TestDriveClass::sendAltitude(float meters)
+{
+  sendAltitude(0, meters);
+}
+
 /** Acceleration */
 
 // void TestDriveClass::sendAcceleration(byte id, float x, float y, float z)
@@ -234,7 +246,10 @@ byte* TestDriveClass::floatToBytes2(float x, float y, float z)
   f2b.v.y = y;
   f2b.v.z = z;
 
-  return f2b.b;
+  byte* buff = {0};
+  memcpy(buff, f2b.b, 3 * sizeof(float));
+
+  return buff;
 }
 
 byte* TestDriveClass::floatToBytes(float num)
@@ -243,7 +258,10 @@ byte* TestDriveClass::floatToBytes(float num)
   float2bytes f2b;
   f2b.f = num;
 
-  return f2b.b;
+  byte* buff = {0};
+  memcpy(buff, f2b.b, sizeof(float));
+
+  return buff;
 }
 
 void TestDriveClass::sendEvent(byte type, byte id, byte bytec, byte* bytev)

@@ -44,8 +44,10 @@ typedef enum
   SENSOR_TYPE_TEMPERATURE           = 0x13,
   SENSOR_TYPE_VOLTAGE               = 0x15,
   SENSOR_TYPE_CURRENT               = 0x16,
-  SENSOR_TYPE_COLOR                 = 0x17
-};
+  SENSOR_TYPE_COLOR                 = 0x17,
+
+  SENSOR_TYPE_ALTITUDE              = 0x19
+} sensor_t;
 
 
 class TestDriveClass : public FirmataClass
@@ -87,6 +89,9 @@ public:
     
     void sendVoltage(byte id, float volts);
     void sendVoltage(float volts);                       // V
+
+    void sendAltitude(byte id, float meters);            // meters
+    void sendAltitude(float meters);
     
     // void sendColor(byte id, float r, float g, float b);
     // void sendColor(float r, float g, float b);  // RGB
