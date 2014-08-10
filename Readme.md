@@ -1,5 +1,4 @@
 # TestDrive Arduino Library
-===
 
 This library adds Arduino support for the TestDrive dashboard. It provides a simple API, and supports for many common sensor types.
 
@@ -44,8 +43,8 @@ void loop()
 ```
 
 ## Examples
-* [Getting Started](#)
-* [Weather Station](#) using BMP180 and DHT22 sensors
+* [Getting Started](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/getting_started)
+* [Weather Station](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/weather_station) using BMP180 and DHT22 sensors
 
 ## Future
 * Support for more sensor types, with better dashboard visualisations.
@@ -57,7 +56,7 @@ void loop()
 ## Contributing
 All contributions welcome.
 
-Developers should take a look at the [DEVELOPER.md](#) document for how to setup their environment.
+Developers should take a look at the [DEVELOPER.md](https://github.com/blakejakopovic/TestDrive-Arduino/blob/master/DEVELOPER.md) document for how to setup their environment.
 
 ## License
 
