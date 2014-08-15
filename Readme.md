@@ -43,7 +43,7 @@ void loop()
 ```
 
 ## Examples
-* [Getting Started](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/getting_started)
+* [Getting Started](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/GettingStarted)
 
 ## Future
 * Support for more sensor types, with better dashboard visualisations.
