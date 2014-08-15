@@ -44,7 +44,6 @@ void loop()
 
 ## Examples
 * [Getting Started](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/getting_started)
-* [Weather Station](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/weather_station) using BMP180 and DHT22 sensors
 
 ## Future
 * Support for more sensor types, with better dashboard visualisations.
