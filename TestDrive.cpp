@@ -31,6 +31,7 @@ byte* floatToBytes(float num);
 byte* floatToBytes2(float x, float y, float z);
 void sendEvent(byte type, byte id, byte bytec, byte* bytev);
 
+
 //******************************************************************************
 //* Public Methods
 //******************************************************************************
@@ -228,8 +229,6 @@ void TestDriveClass::sendLog(char* msg)
 {
   sendLog(0, msg);
 }
-
-
 
 
 //******************************************************************************

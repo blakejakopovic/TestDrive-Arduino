@@ -15,13 +15,8 @@
 #ifndef TestDrive_h
 #define TestDrive_h
 
-#include "lib/FirmataMaster/Firmata.h"
-
-// Firmata version check
-#if FIRMATA_MAJOR_VERSION != 2 || FIRMATA_MINOR_VERSION != 4
-  #error "TestDrive requires Firmata version 2.4.x to run."
-#endif
-
+// Requires Firmata ~2.4.0
+#include "Firmata.h"
 
 /** Event Types */
 #define SYSEX_TYPE_EVENT             0x01
