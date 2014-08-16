@@ -1,5 +1,5 @@
 /*
- * Testdrive.h - TestDrive Arduino library
+ * Testdrive.h - TestDrive library v0.1.0
  * 
  * (C) Copyright 2014 Blake Jakopovic.
  *
@@ -18,6 +18,11 @@
 // Requires Firmata ~2.4.0
 #include "Firmata.h"
 
+/** Versioning */
+#define TESTDRIVE_MAJOR_VERSION   0 // for non-compatible changes
+#define TESTDRIVE_MINOR_VERSION   1 // for backwards compatible changes
+#define TESTDRIVE_BUGFIX_VERSION  0 // for bugfix releases
+
 /** Event Types */
 #define SYSEX_TYPE_EVENT             0x01
 #define SYSEX_TYPE_LABEL             0x02
@@ -26,24 +31,34 @@
 /** Event Kinds */
 typedef enum
 {
-  SENSOR_TYPE_ACCELEROMETER         = 0x01,
-  SENSOR_TYPE_MAGNETIC_FIELD        = 0x02,
-  SENSOR_TYPE_ORIENTATION           = 0x03,
-  SENSOR_TYPE_GYROSCOPE             = 0x04,
-  SENSOR_TYPE_LIGHT                 = 0x05,
-  SENSOR_TYPE_PRESSURE              = 0x06,
-
-  SENSOR_TYPE_PROXIMITY             = 0x08,
-
-  SENSOR_TYPE_HUMIDITY              = 0x12,
-  SENSOR_TYPE_TEMPERATURE           = 0x13,
-  SENSOR_TYPE_VOLTAGE               = 0x15,
-  SENSOR_TYPE_CURRENT               = 0x16,
-  SENSOR_TYPE_COLOR                 = 0x17,
-
-  SENSOR_TYPE_ALTITUDE              = 0x19
+  SENSOR_TYPE_ACCELEROMETER        = 0x01,
+  SENSOR_TYPE_MAGNETIC_FIELD,
+  SENSOR_TYPE_ORIENTATION,
+  SENSOR_TYPE_GYROSCOPE,
+  SENSOR_TYPE_LIGHT,
+  SENSOR_TYPE_PRESSURE,
+  SENSOR_TYPE_PROXIMITY,
+  SENSOR_TYPE_HUMIDITY,
+  SENSOR_TYPE_TEMPERATURE,
+  SENSOR_TYPE_VOLTAGE,
+  SENSOR_TYPE_CURRENT,
+  SENSOR_TYPE_COLOR,
+  SENSOR_TYPE_ALTITUDE
 } sensor_t;
 
+/** Labels */
+
+#define MAX_LABEL_COUNT 10
+#define MAX_LABEL_LENGTH 20 // +1 string termination
+
+/** Rate Limits */
+// If you want to disable rate limiting uncomment
+// #define TD_DISABLE_RATE_LIMIT
+#define MAX_SAMPLE_RATE 50 // Hz per kind per id
+
+/** Processing */
+
+#define MAX_PROCESS_RATE 5000 // ms
 
 class TestDriveClass : public FirmataClass
 {
@@ -96,12 +111,26 @@ public:
     void sendLog(byte id, char* msg);
     void sendLog(char* msg);
 
+    void process();
+
 private:
+    /* private variables ---------------------------- */
+    char labels[MAX_LABEL_COUNT][MAX_LABEL_LENGTH+1];
+#ifndef TD_DISABLE_RATE_LIMIT
+    unsigned int sample_rate[15][MAX_LABEL_COUNT];
+    unsigned long last_sample_reset;
+#endif
+    unsigned long last_processed;
+
     /* private methods ------------------------------ */
     byte* floatToBytes(float num);
     byte* floatToBytes2(float x, float y, float z);
 
-    void sendEvent(byte type, byte id, byte bytec, byte* bytev);
+    void setLabel(byte id, char* label, bool update);
+
+    bool rateLimited(byte kind, byte id);
+
+    void sendEvent(byte kind, byte id, byte bytec, byte* bytev);
 };
 
 extern TestDriveClass TestDrive;

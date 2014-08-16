@@ -1,5 +1,5 @@
 /*
- * Testdrive.cpp - TestDrive Arduino library
+ * Testdrive.cpp - TestDrive library v0.1.0
  * 
  * (C) Copyright 2014 Blake Jakopovic.
  *
@@ -20,7 +20,20 @@
 //* Constructors
 //******************************************************************************
 
-TestDriveClass::TestDriveClass() {}
+TestDriveClass::TestDriveClass()
+{
+  // Reset labels
+    memcpy(labels, 0, sizeof labels);
+
+#ifndef TD_DISABLE_RATE_LIMIT
+  // Reset sample rate counters
+    memcpy(sample_rate, 0, sizeof sample_rate);
+
+  last_sample_reset = 0;
+#endif
+  
+  last_processed = 0;
+}
 
 
 //******************************************************************************
@@ -197,32 +210,21 @@ void TestDriveClass::sendAltitude(float meters)
 
 void TestDriveClass::setLabel(byte id, char* label)
 {
-  // TODO: store label and resend every 3 seconds to make 
-  // sure the client didn't miss the message
-
-  byte i;
-  write(START_SYSEX);
-  write(SYSEX_TYPE_LABEL);
-  write(id);
-  for(i=0; i<strlen(label); i++) {
-    sendValueAsTwo7bitBytes(label[i]);
-  }
-  write(END_SYSEX);
+  setLabel(id, label, true);
 }
-
 
 /** Log */
 
 void TestDriveClass::sendLog(byte id, char* msg)
 {
   byte i;
-  write(START_SYSEX);
+  startSysex();
   write(SYSEX_TYPE_LOG);
   write(id);
   for(i=0; i<strlen(msg); i++) {
     sendValueAsTwo7bitBytes(msg[i]);
   }
-  write(END_SYSEX);
+  endSysex();
 }
 
 void TestDriveClass::sendLog(char* msg)
@@ -230,10 +232,53 @@ void TestDriveClass::sendLog(char* msg)
   sendLog(0, msg);
 }
 
+void TestDriveClass::process()
+{
+  int i;
+  unsigned long now = millis();
+
+  // Check processing rate limiting
+  if (last_processed + MAX_PROCESS_RATE < now) {
+
+    // Update last processed
+    last_processed = now;
+
+    // Loop over labels
+    for(i=0; i<MAX_LABEL_COUNT; i++)
+    {
+      // Check if label is set
+      if (strcmp(labels[i], "") != 0) {
+        setLabel(i, labels[i], false);
+      }
+    }
+  }
+}
+
 
 //******************************************************************************
 //* Private Methods
 //******************************************************************************
+
+/** Label */
+
+void TestDriveClass::setLabel(byte id, char* label, bool update)
+{
+  // Update internal label value
+  if (update) {
+    strncpy(labels[id], label, MAX_LABEL_LENGTH);
+  }
+
+  byte i;
+  startSysex();
+  write(SYSEX_TYPE_LABEL);
+  write(id);
+  for(i=0; i<strlen(label); i++) {
+    sendValueAsTwo7bitBytes(label[i]);
+  }
+  endSysex();
+}
+
+/** Encoding */
 
 byte* TestDriveClass::floatToBytes2(float x, float y, float z)
 {
@@ -245,10 +290,10 @@ byte* TestDriveClass::floatToBytes2(float x, float y, float z)
   f2b.v.y = y;
   f2b.v.z = z;
 
-  byte* buff = {0};
+  byte buff[3 * sizeof(float)];
   memcpy(buff, f2b.b, 3 * sizeof(float));
 
-  return buff;
+  return (byte*)buff;
 }
 
 byte* TestDriveClass::floatToBytes(float num)
@@ -257,23 +302,59 @@ byte* TestDriveClass::floatToBytes(float num)
   float2bytes f2b;
   f2b.f = num;
 
-  byte* buff = {0};
+  byte buff[sizeof(float)];
   memcpy(buff, f2b.b, sizeof(float));
 
-  return buff;
+  return (byte*)buff;
 }
 
-void TestDriveClass::sendEvent(byte type, byte id, byte bytec, byte* bytev)
+/** Rate Limiting */
+#ifndef TD_DISABLE_RATE_LIMIT
+bool TestDriveClass::rateLimited(byte kind, byte id)
 {
+  unsigned long now = millis();
+
+  // Check processing rate limiting
+  if (last_sample_reset + 1000 < now)
+  {
+    // Update last sample time
+    last_sample_reset = now;
+
+    // Reset sample rate counters
+    memcpy(sample_rate, 0, sizeof sample_rate);
+  }
+
+  // Increment sample rate counter
+  sample_rate[kind][id] += 1;
+  
+  // Check if rate limit reached
+  if (sample_rate[kind][id] > MAX_SAMPLE_RATE) {
+    // TODO: Add sendLog message to notify user (might be too noisey)
+    return true;
+  }
+
+  return false;
+}
+#endif
+
+/** Events */
+
+void TestDriveClass::sendEvent(byte kind, byte id, byte bytec, byte* bytev)
+{
+#ifndef TD_DISABLE_RATE_LIMIT
+  // NOOP if rate limit reached
+  if (rateLimited(kind, id)) return;
+#endif
+
   byte i;
-  write(START_SYSEX);
+  startSysex();
   write(SYSEX_TYPE_EVENT);
-  write(type);
+  write(kind);
   write(id);
   for(i=0; i<bytec; i++) {
     sendValueAsTwo7bitBytes(bytev[i]);
   }
-  write(END_SYSEX);
+  endSysex();
 }
 
 // make one instance for the user to use
