@@ -16,25 +16,6 @@
 #include "TestDrive.h"
 #include "HardwareSerial.h"
 
-//******************************************************************************
-//* Constructors
-//******************************************************************************
-
-TestDriveClass::TestDriveClass()
-{
-  // Reset labels
-    memcpy(labels, 0, sizeof labels);
-
-#ifndef TD_DISABLE_RATE_LIMIT
-  // Reset sample rate counters
-    memcpy(sample_rate, 0, sizeof sample_rate);
-
-  last_sample_reset = 0;
-#endif
-  
-  last_processed = 0;
-}
-
 
 //******************************************************************************
 //** Support Methods
@@ -43,6 +24,30 @@ TestDriveClass::TestDriveClass()
 byte* floatToBytes(float num);
 byte* floatToBytes2(float x, float y, float z);
 void sendEvent(byte type, byte id, byte bytec, byte* bytev);
+void resetSampleRates();
+
+
+//******************************************************************************
+//* Constructors
+//******************************************************************************
+
+TestDriveClass::TestDriveClass()
+{
+  // Reset labels
+  memset(TestDriveClass::labels, 0, sizeof(TestDriveClass::labels));
+
+#ifndef TD_DISABLE_RATE_LIMIT
+  resetSampleRates();
+
+  last_sample_reset = 0;
+  rate_limit_logged = false;
+#endif
+  
+  last_processed = 0;
+
+  memset(TestDriveClass::monitors, 0, sizeof(TestDriveClass::monitors));
+  monitorc = 0;
+}
 
 
 //******************************************************************************
@@ -61,6 +66,18 @@ void TestDriveClass::sendTemperature(float celsius)
   sendTemperature(0, celsius);
 }
 
+void TestDriveClass::monitorTemperature(byte id, float *celsius)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_TEMPERATURE, id, 1, celsius);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorTemperature(float *celsius)
+{
+  monitorTemperature(0, celsius);
+}
+
 /** Humidity */
 
 void TestDriveClass::sendHumidity(byte id, float percent)
@@ -71,6 +88,18 @@ void TestDriveClass::sendHumidity(byte id, float percent)
 void TestDriveClass::sendHumidity(float percent)
 {
   sendHumidity(0, percent);
+}
+
+void TestDriveClass::monitorHumidity(byte id, float *percent)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_HUMIDITY, id, 1, percent);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorHumidity(float *percent)
+{
+  monitorTemperature(0, percent);
 }
 
 /** Orientation */
@@ -97,6 +126,18 @@ void TestDriveClass::sendDistance(float centimeters)
   sendDistance(0, centimeters);
 }
 
+void TestDriveClass::monitorDistance(byte id, float *centimeters)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_PROXIMITY, id, 1, centimeters);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorDistance(float *centimeters)
+{
+  monitorTemperature(0, centimeters);
+}
+
 /** Light */
 
 void TestDriveClass::sendLight(byte id, float lux)
@@ -107,6 +148,18 @@ void TestDriveClass::sendLight(byte id, float lux)
 void TestDriveClass::sendLight(float lux)
 {
   sendLight(0, lux);
+}
+
+void TestDriveClass::monitorLight(byte id, float *lux)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_LIGHT, id, 1, lux);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorLight(float *lux)
+{
+  monitorTemperature(0, lux);
 }
 
 /** Pressure */
@@ -121,6 +174,18 @@ void TestDriveClass::sendPressure(float hectopascal)
   sendPressure(0, hectopascal);
 }
 
+void TestDriveClass::monitorPressure(byte id, float *hectopascal)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_PRESSURE, id, 1, hectopascal);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorPressure(float *hectopascal)
+{
+  monitorTemperature(0, hectopascal);
+}
+
 /** Current */
 
 void TestDriveClass::sendCurrent(byte id, float milliamps)
@@ -131,6 +196,18 @@ void TestDriveClass::sendCurrent(byte id, float milliamps)
 void TestDriveClass::sendCurrent(float milliamps)
 {
   sendCurrent(0, milliamps);
+}
+
+void TestDriveClass::monitorCurrent(byte id, float *milliamps)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_CURRENT, id, 1, milliamps);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorCurrent(float *milliamps)
+{
+  monitorTemperature(0, milliamps);
 }
 
 /**  Voltage */
@@ -145,6 +222,18 @@ void TestDriveClass::sendVoltage(float volts)
   sendVoltage(0, volts);
 }
 
+void TestDriveClass::monitorVoltage(byte id, float *volts)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_VOLTAGE, id, 1, volts);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorVoltage(float *volts)
+{
+  monitorTemperature(0, volts);
+}
+
 /**  Altitude */
 
 void TestDriveClass::sendAltitude(byte id, float meters)
@@ -155,6 +244,18 @@ void TestDriveClass::sendAltitude(byte id, float meters)
 void TestDriveClass::sendAltitude(float meters)
 {
   sendAltitude(0, meters);
+}
+
+void TestDriveClass::monitorAltitude(byte id, float *meters)
+{
+  monitor_entry_t entry;
+  entry = makeMonitorEntry(SENSOR_TYPE_ALTITUDE, id, 1, meters);
+  registerMonitorEntry(entry);
+}
+
+void TestDriveClass::monitorAltitude(float *meters)
+{
+  monitorTemperature(0, meters);
 }
 
 /** Acceleration */
@@ -218,8 +319,7 @@ void TestDriveClass::setLabel(byte id, char* label)
 void TestDriveClass::sendLog(byte id, char* msg)
 {
   byte i;
-  startSysex();
-  write(SYSEX_TYPE_LOG);
+  startSysexType(SYSEX_TYPE_LOG);
   write(id);
   for(i=0; i<strlen(msg); i++) {
     sendValueAsTwo7bitBytes(msg[i]);
@@ -243,12 +343,35 @@ void TestDriveClass::process()
     // Update last processed
     last_processed = now;
 
+#ifndef TD_DISABLE_RATE_LIMIT
+    // Reset rate limit logged
+    rate_limit_logged = false;
+#endif
+
     // Loop over labels
     for(i=0; i<MAX_LABEL_COUNT; i++)
     {
       // Check if label is set
       if (strcmp(labels[i], "") != 0) {
         setLabel(i, labels[i], false);
+      }
+    }
+
+    // Loop over monitored variables
+    for(i=0; i<MAX_MONITOR_COUNT; i++)
+    {
+      monitor_entry_t *e = &monitors[i];
+      
+      if (e->kind > 0)
+      { 
+        switch(e->size) {
+          case 1:
+            sendEvent(e->kind, e->id, sizeof(float), floatToBytes(*(e->vals[0])));
+            break;
+          case 3:
+            sendEvent(e->kind, e->id, (3*sizeof(float)), floatToBytes2(*(e->vals[0]), *(e->vals[1]), *(e->vals[2])));
+            break;
+        }
       }
     }
   }
@@ -269,8 +392,7 @@ void TestDriveClass::setLabel(byte id, char* label, bool update)
   }
 
   byte i;
-  startSysex();
-  write(SYSEX_TYPE_LABEL);
+  startSysexType(SYSEX_TYPE_LABEL);
   write(id);
   for(i=0; i<strlen(label); i++) {
     sendValueAsTwo7bitBytes(label[i]);
@@ -321,7 +443,7 @@ bool TestDriveClass::rateLimited(byte kind, byte id)
     last_sample_reset = now;
 
     // Reset sample rate counters
-    memcpy(sample_rate, 0, sizeof sample_rate);
+    resetSampleRates();
   }
 
   // Increment sample rate counter
@@ -329,7 +451,16 @@ bool TestDriveClass::rateLimited(byte kind, byte id)
   
   // Check if rate limit reached
   if (sample_rate[kind][id] > MAX_SAMPLE_RATE) {
-    // TODO: Add sendLog message to notify user (might be too noisey)
+
+    Serial.println();
+    Serial.print(sample_rate[kind][id]);
+    Serial.print(" > ");
+    Serial.println(MAX_SAMPLE_RATE);
+
+    if (!rate_limit_logged) {
+      sendLog("TestDrive rate limited");
+    }
+
     return true;
   }
 
@@ -339,7 +470,7 @@ bool TestDriveClass::rateLimited(byte kind, byte id)
 
 /** Events */
 
-void TestDriveClass::sendEvent(byte kind, byte id, byte bytec, byte* bytev)
+void TestDriveClass::sendEvent(sensor_t kind, byte id, byte bytec, byte* bytev)
 {
 #ifndef TD_DISABLE_RATE_LIMIT
   // NOOP if rate limit reached
@@ -347,8 +478,7 @@ void TestDriveClass::sendEvent(byte kind, byte id, byte bytec, byte* bytev)
 #endif
 
   byte i;
-  startSysex();
-  write(SYSEX_TYPE_EVENT);
+  startSysexType(SYSEX_TYPE_EVENT);
   write(kind);
   write(id);
   for(i=0; i<bytec; i++) {
@@ -356,6 +486,46 @@ void TestDriveClass::sendEvent(byte kind, byte id, byte bytec, byte* bytev)
   }
   endSysex();
 }
+
+
+/** Sysex */
+void TestDriveClass::startSysexType(sysex_t type)
+{
+  startSysex();
+  write(type);
+}
+
+/** Monitoring */
+
+monitor_entry_t 
+TestDriveClass::makeMonitorEntry(sensor_t kind, byte id, byte size, float *val)
+{
+  monitor_entry_t entry;
+  entry.kind    = kind;
+  entry.id      = id;
+  entry.size    = size;
+  entry.vals[0] = &*val;
+
+  return entry;
+}
+
+void TestDriveClass::registerMonitorEntry(monitor_entry_t entry)
+{
+  if (monitorc < MAX_MONITOR_COUNT) {
+    /* add new entry and increment count */
+    memcpy(&monitors[monitorc++], &entry, sizeof(monitor_entry_t));
+  }
+}
+
+/** Utilities */
+#ifndef TD_DISABLE_RATE_LIMIT
+void TestDriveClass::resetSampleRates()
+{
+  // unsigned int sample_rate[15][MAX_LABEL_COUNT] = {};
+  // memset(sample_rate, 0, sizeof(sample_rate));
+  memset(TestDriveClass::sample_rate, 0, sizeof(TestDriveClass::sample_rate));
+}
+#endif
 
 // make one instance for the user to use
 TestDriveClass TestDrive;
