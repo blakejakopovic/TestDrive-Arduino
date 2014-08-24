@@ -404,30 +404,20 @@ void TestDriveClass::setLabel(byte id, char* label, bool update)
 
 byte* TestDriveClass::floatToBytes2(float x, float y, float z)
 {
-  union floats2bytes { struct {float x; float y; float z;} v;
-                       unsigned char b[3*sizeof(float)]; };
-  
-  floats2bytes f2b;
-  f2b.v.x = x;
-  f2b.v.y = y;
-  f2b.v.z = z;
+  byte buff[3*sizeof(float)];
+  memcpy(buff, &x, sizeof(float));
+  memcpy(buff + sizeof(float), &y, sizeof(float));
+  memcpy(buff + 2*sizeof(float), &z, sizeof(float));
 
-  byte buff[3 * sizeof(float)];
-  memcpy(buff, f2b.b, 3 * sizeof(float));
-
-  return (byte*)buff;
+  return buff;
 }
 
 byte* TestDriveClass::floatToBytes(float num)
 {
-  union float2bytes { float f; unsigned char b[sizeof(float)]; };
-  float2bytes f2b;
-  f2b.f = num;
-
   byte buff[sizeof(float)];
-  memcpy(buff, f2b.b, sizeof(float));
+  memcpy(buff, &num, sizeof(float));
 
-  return (byte*)buff;
+  return buff;
 }
 
 /** Rate Limiting */
