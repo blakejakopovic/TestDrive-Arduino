@@ -1,13 +1,12 @@
 # TestDrive Arduino Library
 
-This library adds Arduino support for the TestDrive dashboard. It provides a simple API, and supports for many common sensor types.
+This library adds Arduino support for the TestDrive Dashboard. It provides a simple API with support for common sensor data.
 
-**This library is build to work with [TestDrive Dashboard](https://github.com/blakejakopovic/TestDrive) to provide a real-time dashboard for your Arduino projects.**
+**This library is designed to work with the [TestDrive Dashboard](https://github.com/blakejakopovic/TestDrive) desktop application to provide a real-time dashboard view for your Arduino projects.**
 
 ## Demo!
 
-To view the demo dashboard, please visit [http://blakejakopovic.github.io/TestDrive/](http://blakejakopovic.github.io/TestDrive/). It uses simulated
-sensor readings, but your dashboard will be automatically customised based on the data you send it.
+To view the demo dashboard, please visit [http://blakejakopovic.github.io/TestDrive/](http://blakejakopovic.github.io/TestDrive/). The demo uses simulated sensor readings, however your dashboard will be automatically customised based on the data you send it.
 
 ## Key Features
 * Simple integration into existing projects
@@ -46,7 +45,7 @@ void loop()
 * [Getting Started](https://github.com/blakejakopovic/TestDrive-Arduino/tree/master/examples/GettingStarted)
 
 ## Future
-* Support for more sensor types, with better dashboard visualisations.
+* Support for more sensor types, with more contextual (Mapping, 3D, etc) dashboard visualisations.
 * Support for TCP, for both Ethernet and Wifi data transport
 
 ## Thank you
