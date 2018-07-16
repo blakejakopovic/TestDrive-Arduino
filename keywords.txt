@@ -1,18 +1,18 @@
-TestDrive KEYWORD1
+TestDrive	KEYWORD1
 
-sendAcceleration KEYWORD2
-sendMagnetic KEYWORD2
-sendOrientation KEYWORD2
-sendGyro KEYWORD2
-sendTemperature KEYWORD2
-sendDistance KEYWORD2
-sendLight KEYWORD2
-sendPressure KEYWORD2
-sendHumidity KEYWORD2
-sendCurrent KEYWORD2
-sendVoltage KEYWORD2
-sendColor KEYWORD2
-sendAltitude KEYWORD2
+sendAcceleration	KEYWORD2
+sendMagnetic	KEYWORD2
+sendOrientation	KEYWORD2
+sendGyro	KEYWORD2
+sendTemperature	KEYWORD2
+sendDistance	KEYWORD2
+sendLight	KEYWORD2
+sendPressure	KEYWORD2
+sendHumidity	KEYWORD2
+sendCurrent	KEYWORD2
+sendVoltage	KEYWORD2
+sendColor	KEYWORD2
+sendAltitude	KEYWORD2
 
-setLabel KEYWORD2
-sendLog KEYWORD2
+setLabel	KEYWORD2
+sendLog	KEYWORD2
